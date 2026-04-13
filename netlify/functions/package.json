@@ -1,0 +1,11 @@
+{
+  "name": "mona-invest-functions",
+  "version": "1.0.0",
+  "description": "Netlify serverless functions for Mona Invest",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.0"
+  }
+}
