@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mona Invest — Gestion de patrimoine et conseils financiers personnalisés">
+  <title>Mona Invest</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- ============================================================
+     LOADING SCREEN
+     ============================================================ -->
+<div id="loading-screen">
+  <div class="loading-logo">
+    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="28" cy="28" rx="24" ry="13" stroke="#B87333" stroke-width="2.5"/>
+      <circle cx="28" cy="28" r="7" fill="#B87333"/>
+      <circle cx="28" cy="28" r="2.5" fill="#0A0A0A"/>
+      <line x1="28" y1="2" x2="28" y2="11" stroke="#B87333" stroke-width="2"/>
+      <line x1="28" y1="45" x2="28" y2="54" stroke="#B87333" stroke-width="2"/>
+    </svg>
+  </div>
+  <div class="loading-spinner"></div>
+</div>
+
+<!-- ============================================================
+     AUTH SCREEN
+     ============================================================ -->
+<div id="auth-screen" class="hidden">
+  <div class="auth-container">
+
+    <div class="auth-logo-wrap">
+      <svg width="40" height="40" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="28" cy="28" rx="24" ry="13" stroke="#B87333" stroke-width="2.5"/>
+        <circle cx="28" cy="28" r="7" fill="#B87333"/>
+        <circle cx="28" cy="28" r="2.5" fill="#0A0A0A"/>
+      </svg>
+      <span class="brand-name">MONA INVEST</span>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab-btn active" data-tab="login">Connexion</button>
+      <button class="auth-tab-btn" data-tab="register">Inscription</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" class="auth-form">
+      <div class="form-group">
+        <label>Email</label>
+        <input id="login-email" type="email" placeholder="vous@exemple.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input id="login-password" type="password" placeholder="••••••••" required autocomplete="current-password">
+      </div>
+      <div id="login-error" class="form-error hidden"></div>
+      <button type="submit" class="btn-primary full-width" style="margin-top:0.5rem">Se connecter</button>
+
+      <div class="auth-divider">ou continuer avec</div>
+      <div class="auth-oauth">
+        <button type="button" class="btn-google">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continuer avec Google
+        </button>
+        <button type="button" class="btn-apple">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Continuer avec Apple
+        </button>
+      </div>
+    </form>
+
+    <!-- Register Form -->
+    <form id="register-form" class="auth-form hidden">
+      <div class="form-group">
+        <label>Nom complet</label>
+        <input id="register-name" type="text" placeholder="Jean Dupont" required autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input id="register-email" type="email" placeholder="vous@exemple.com" required autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input id="register-password" type="password" placeholder="8 caractères minimum" required autocomplete="new-password">
+      </div>
+      <div id="register-error" class="form-error hidden"></div>
+      <button type="submit" class="btn-primary full-width" style="margin-top:0.5rem">Créer mon compte</button>
+
+      <div class="auth-divider">ou continuer avec</div>
+      <div class="auth-oauth">
+        <button type="button" class="btn-google">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continuer avec Google
+        </button>
+        <button type="button" class="btn-apple">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Continuer avec Apple
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     ONBOARDING
+     ============================================================ -->
+<div id="onboarding-screen" class="hidden">
+  <div class="onboarding-container">
+
+    <div class="onboarding-header">
+      <h1>Bienvenue sur Mona Invest</h1>
+      <p style="color:var(--text-secondary)">Configurons votre profil en 3 étapes</p>
+      <div class="onboarding-progress" style="margin-top:1.25rem">
+        <div class="progress-bar-track">
+          <div id="onboarding-progress-bar"></div>
+        </div>
+        <div class="progress-dots">
+          <div class="progress-dot active"></div>
+          <div class="progress-dot"></div>
+          <div class="progress-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1 -->
+    <div id="onboarding-step-1" class="onboarding-step onboarding-card">
+      <h2>Checkup Financier</h2>
+      <p>Pour calculer votre capacité d'investissement mensuelle.</p>
+      <div class="form-group">
+        <label>Revenus nets mensuels (€)</label>
+        <input id="ob-income" type="number" placeholder="ex: 2500" min="0" step="100">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Dépenses fixes (loyer, crédits…)</label>
+          <input id="ob-fixed" type="number" placeholder="ex: 900" min="0" step="50">
+        </div>
+        <div class="form-group">
+          <label>Dépenses variables estimées</label>
+          <input id="ob-variable" type="number" placeholder="ex: 600" min="0" step="50">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Épargne de précaution existante (€)</label>
+        <input id="ob-savings" type="number" placeholder="ex: 5000" min="0" step="500">
+      </div>
+      <div class="investable-display">
+        <div class="label">Capital investissable estimé</div>
+        <div class="amount" id="ob-investable">— €/mois</div>
+      </div>
+      <div class="onboarding-actions">
+        <button id="onboarding-next-1" class="btn-primary">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="onboarding-step-2" class="onboarding-step onboarding-card hidden">
+      <h2>Mode d'Investissement</h2>
+      <p>Choisissez votre rythme mensuel d'investissement.</p>
+      <div class="mode-cards">
+        <div class="mode-card" data-mode="chill" data-budget="150">
+          <div class="mode-icon">🌿</div>
+          <div class="mode-name">Chill</div>
+          <div class="mode-amount">~150€/mois</div>
+          <div class="mode-desc">Démarrer tranquillement</div>
+        </div>
+        <div class="mode-card selected" data-mode="balanced" data-budget="300">
+          <div class="mode-icon">⚖️</div>
+          <div class="mode-name">Équilibré</div>
+          <div class="mode-amount">~300€/mois</div>
+          <div class="mode-desc">Le meilleur compromis</div>
+        </div>
+        <div class="mode-card" data-mode="ambitious" data-budget="500">
+          <div class="mode-icon">🚀</div>
+          <div class="mode-name">Ambitieux</div>
+          <div class="mode-amount">~500€/mois</div>
+          <div class="mode-desc">Accélérer la croissance</div>
+        </div>
+      </div>
+      <div class="onboarding-actions">
+        <button type="button" class="btn-secondary" onclick="App && document.getElementById('onboarding-step-1').classList.remove('hidden') || true" style="display:none">← Retour</button>
+        <button id="onboarding-next-2" class="btn-primary">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="onboarding-step-3" class="onboarding-step onboarding-card hidden">
+      <h2>Vos Objectifs de Vie</h2>
+      <p>Sélectionnez un ou plusieurs objectifs (vous pourrez les modifier plus tard).</p>
+      <div class="goals-grid">
+        <button class="goal-btn" data-goal="financial_freedom"><span class="goal-icon">🏆</span> Liberté financière</button>
+        <button class="goal-btn" data-goal="real_estate"><span class="goal-icon">🏠</span> Achat immobilier</button>
+        <button class="goal-btn" data-goal="travel"><span class="goal-icon">✈️</span> Voyages</button>
+        <button class="goal-btn" data-goal="early_retirement"><span class="goal-icon">🌴</span> Retraite anticipée</button>
+        <button class="goal-btn" data-goal="business"><span class="goal-icon">💼</span> Créer une entreprise</button>
+        <button class="goal-btn" data-goal="passive_income"><span class="goal-icon">💰</span> Revenus passifs</button>
+      </div>
+      <div class="onboarding-actions">
+        <button id="onboarding-finish" class="btn-primary">Commencer →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN APP
+     ============================================================ -->
+<div id="app" class="hidden">
+
+  <!-- Mobile topbar -->
+  <div class="mobile-topbar">
+    <button id="hamburger-btn">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="brand-name">MONA INVEST</span>
+    <div style="width:22px"></div>
+  </div>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div id="sidebar-overlay" class="hidden"></div>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="32" height="32" viewBox="0 0 56 56" fill="none">
+        <ellipse cx="28" cy="28" rx="24" ry="13" stroke="#B87333" stroke-width="2.5"/>
+        <circle cx="28" cy="28" r="7" fill="#B87333"/>
+        <circle cx="28" cy="28" r="2.5" fill="#0A0A0A"/>
+      </svg>
+      <span class="brand-name">MONA INVEST</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="feed">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Feed
+      </a>
+      <a href="#" class="nav-item" data-section="dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="nav-item" data-section="calendar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Dividendes
+      </a>
+      <a href="#" class="nav-item" data-section="chat">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Conseiller IA
+      </a>
+      <a href="#" class="nav-item" data-section="portfolio">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        Portefeuille
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button id="sidebar-pro-btn" class="sidebar-pro-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Passer Pro — 9,99€/mois
+      </button>
+      <div class="user-info">
+        <div class="user-avatar" id="user-initials">—</div>
+        <div class="user-details">
+          <div class="name" id="user-name">—</div>
+          <div class="email" id="user-email">—</div>
+        </div>
+        <span id="plan-badge" class="plan-badge">FREE</span>
+        <button id="logout-btn" title="Se déconnecter">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- FEED -->
+    <section id="section-feed" class="section">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h1>Feed</h1>
+          <span class="section-subtitle">Opportunités du mois générées par l'IA</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+          <div class="feed-filters">
+            <button class="filter-btn active" data-filter="all">Tout</button>
+            <button class="filter-btn" data-filter="dividend">Dividendes</button>
+            <button class="filter-btn" data-filter="catalyst">Catalyseurs</button>
+            <button class="filter-btn" data-filter="signal">Signaux</button>
+            <button class="filter-btn" data-filter="pea">PEA</button>
+            <button class="filter-btn" data-filter="etoro">eToro</button>
+          </div>
+          <button id="feed-refresh-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Actualiser
+          </button>
+        </div>
+      </div>
+      <div id="feed-grid" class="feed-grid"></div>
+      <div id="feed-blur-cta" class="feed-blur-cta hidden">
+        <div class="feed-cta-content">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#B87333" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <p>Débloquez le feed complet avec <strong>Mona Invest Pro</strong></p>
+          <button class="btn-primary" onclick="App.showProModal()">Passer Pro — 9,99€/mois</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="section-dashboard" class="section hidden">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h1>Dashboard</h1>
+          <span id="dashboard-date" class="section-subtitle"></span>
+        </div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="dashboard-card span-2">
+          <div class="dash-card-label">Patrimoine Total</div>
+          <div class="dash-card-value mono" id="dash-total-wealth">0,00 €</div>
+          <div class="dash-pnl" id="dash-pnl">+0,00 € (0,00% YTD)</div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dash-card-label">PEA</div>
+          <div class="dash-card-value mono" id="dash-pea-value">0,00 €</div>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.25rem">
+            <div class="legend-dot legend-dot--pea"></div>
+            <span id="pea-pct" class="text-muted" style="font-size:0.8rem;font-family:var(--font-mono)">—%</span>
+          </div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dash-card-label">eToro</div>
+          <div class="dash-card-value mono" id="dash-etoro-value">0,00 €</div>
+          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.25rem">
+            <div class="legend-dot legend-dot--etoro"></div>
+            <span id="etoro-pct" class="text-muted" style="font-size:0.8rem;font-family:var(--font-mono)">—%</span>
+          </div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dash-card-label">Répartition</div>
+          <div class="wealth-bar-wrap">
+            <div class="wealth-bar-track">
+              <div class="wealth-bar-pea" id="pea-bar" style="width:50%"></div>
+              <div class="wealth-bar-etoro" id="etoro-bar" style="width:50%"></div>
+            </div>
+            <div class="wealth-bar-legend">
+              <div class="legend-item"><div class="legend-dot legend-dot--pea"></div>PEA</div>
+              <div class="legend-item"><div class="legend-dot legend-dot--etoro"></div>eToro</div>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dash-card-label">Jauge de Risque</div>
+          <div id="risk-label" style="font-size:0.875rem;font-weight:700;margin-bottom:0.5rem">—</div>
+          <div class="risk-gauge-wrap">
+            <div class="risk-gauge-track"><div id="risk-gauge-fill" style="width:0%"></div></div>
+            <div class="risk-gauge-labels"><span>Faible</span><span>Modéré</span><span>Élevé</span></div>
+          </div>
+        </div>
+        <div class="dashboard-card">
+          <div class="dash-card-label">Objectifs</div>
+          <div id="dash-goals"><p class="text-muted">Chargement…</p></div>
+        </div>
+        <div class="dashboard-card span-2">
+          <div class="dash-card-label">Ce Mois-ci</div>
+          <div class="monthly-wrap">
+            <span class="mode-tag" id="dash-mode-label">Équilibré</span>
+            <span class="budget-amount mono" id="dash-monthly-budget">300€</span>
+          </div>
+          <p id="dash-remaining" style="font-size:0.85rem;color:var(--text-muted);margin-top:0.35rem"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALENDRIER DIVIDENDES -->
+    <section id="section-calendar" class="section hidden">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h1>Dividendes</h1>
+          <span class="section-subtitle">Revenus passifs estimés de vos positions</span>
+        </div>
+      </div>
+      <div class="calendar-total-card">
+        <div class="calendar-total-label">Total revenus passifs estimés (trimestre)</div>
+        <div class="calendar-total-value mono" id="calendar-total">0,00 €</div>
+      </div>
+      <div id="calendar-list"></div>
+    </section>
+
+    <!-- CONSEILLER IA -->
+    <section id="section-chat" class="section hidden">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h1>Conseiller IA</h1>
+          <span class="section-subtitle">Votre assistante financière personnelle</span>
+        </div>
+      </div>
+      <div class="chat-layout">
+        <div class="chat-header-bar">
+          <div class="chat-credits-info">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Crédits : <span class="chat-credits-badge" id="ia-credits-count">5</span>
+          </div>
+          <button id="chat-clear-btn" class="btn-icon" title="Effacer l'historique">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+        <div id="chat-messages"></div>
+        <div id="chat-suggestions"></div>
+        <div id="chat-input-area">
+          <form id="chat-form">
+            <textarea id="chat-input" rows="1" placeholder="Posez votre question à Mona…"></textarea>
+            <button type="submit" class="btn-primary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Envoyer
+            </button>
+          </form>
+        </div>
+        <div id="chat-blocked-msg" class="hidden">
+          <p>Vous avez utilisé tous vos crédits IA ce mois-ci.</p>
+          <button id="reward-ad-btn" class="hidden">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            Regarder une pub (+3 crédits)
+          </button>
+          <button class="btn-primary" style="margin-top:0.75rem" onclick="App.showProModal()">Passer Pro — illimité</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PORTEFEUILLE -->
+    <section id="section-portfolio" class="section hidden">
+      <div class="section-header">
+        <div class="section-title-group">
+          <h1>Portefeuille</h1>
+          <span class="section-subtitle">Suivi de vos positions</span>
+        </div>
+      </div>
+      <div class="portfolio-summary">
+        <div class="summary-card"><div class="summary-label">Capital Investi</div><div class="summary-value mono" id="portfolio-total-invested">0,00 €</div></div>
+        <div class="summary-card"><div class="summary-label">Valeur Actuelle</div><div class="summary-value mono" id="portfolio-total-value">0,00 €</div></div>
+        <div class="summary-card"><div class="summary-label">P&amp;L Total</div><div class="summary-value mono" id="portfolio-total-pnl">+0,00 €</div></div>
+        <div class="summary-card"><div class="summary-label">PEA</div><div class="summary-value mono" id="portfolio-pea-value">0,00 €</div></div>
+        <div class="summary-card"><div class="summary-label">eToro</div><div class="summary-value mono" id="portfolio-etoro-value">0,00 €</div></div>
+        <div class="summary-card"><div class="summary-label">Positions</div><div class="summary-value" id="portfolio-count">0</div></div>
+      </div>
+      <div class="portfolio-actions">
+        <div class="platform-tabs">
+          <button class="platform-tab active" data-platform="pea">PEA</button>
+          <button class="platform-tab" data-platform="etoro">eToro</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          <span id="position-limit-info" class="hidden"></span>
+          <button id="add-position-btn" class="btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter
+          </button>
+        </div>
+      </div>
+      <div id="positions-list"></div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-items">
+      <button class="bottom-nav-item active" data-section="feed" onclick="App.navigate('feed')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Feed
+      </button>
+      <button class="bottom-nav-item" data-section="dashboard" onclick="App.navigate('dashboard')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dash
+      </button>
+      <button class="bottom-nav-item" data-section="calendar" onclick="App.navigate('calendar')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Divid.
+      </button>
+      <button class="bottom-nav-item" data-section="chat" onclick="App.navigate('chat')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        IA
+      </button>
+      <button class="bottom-nav-item" data-section="portfolio" onclick="App.navigate('portfolio')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        Portef.
+      </button>
+    </div>
+  </nav>
+
+  <!-- AD BANNER -->
+  <div id="ad-banner" class="hidden">
+    <span class="ad-label">PUB</span>
+    <div id="ad-icon"></div>
+    <div class="ad-content">
+      <span id="ad-title"></span>
+      <span id="ad-desc"></span>
+    </div>
+    <button id="ad-cta"></button>
+  </div>
+
+</div><!-- /#app -->
+
+<!-- MODALS -->
+<div id="modal-overlay" class="hidden">
+  <div id="modal-feed-detail" class="modal hidden"></div>
+  <div id="modal-position" class="modal hidden"></div>
+
+  <!-- Pro modal -->
+  <div id="modal-pro" class="modal hidden">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#B87333"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span class="modal-title">Mona Invest Pro</span>
+        <span class="pro-modal-badge">PRO</span>
+      </div>
+      <button class="modal-close" id="pro-modal-close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="pro-modal-message" class="hidden"></div>
+      <div class="pro-price mono">9,99€<span style="font-size:1rem;color:var(--text-muted)">/mois</span></div>
+      <p class="pro-price-sub">Annulez à tout moment. Sans engagement.</p>
+      <div class="pro-features">
+        <div class="pro-feature"><div class="pro-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4CAF7A" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Feed illimité — toutes les opportunités IA</div>
+        <div class="pro-feature"><div class="pro-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4CAF7A" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Conseiller IA illimité — questions sans limite</div>
+        <div class="pro-feature"><div class="pro-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4CAF7A" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Portefeuille illimité — positions sans limite</div>
+        <div class="pro-feature"><div class="pro-feature-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4CAF7A" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>Zéro publicité — expérience épurée</div>
+      </div>
+      <button id="pro-subscribe-btn" class="btn-primary full-width" style="margin-top:0.5rem">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Activer Pro
+      </button>
+    </div>
+  </div>
+
+  <!-- Rewarded ad modal -->
+  <div id="modal-rewarded-ad" class="modal hidden" style="max-width:400px">
+    <div class="modal-header">
+      <h2 class="modal-title">Regarder une publicité</h2>
+      <button class="modal-close" onclick="Chat.closeRewardModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body reward-modal-content">
+      <p style="color:var(--text-secondary);margin-bottom:0.75rem">Regardez cette publicité pour gagner +3 crédits IA.</p>
+      <div class="reward-ad-placeholder">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 0.75rem;display:block"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        Publicité en cours…
+      </div>
+      <div class="reward-progress-track"><div id="reward-progress"></div></div>
+      <p id="reward-countdown" style="text-align:center;margin-bottom:1rem">10</p>
+      <button id="reward-claim-btn" class="btn-primary full-width" disabled>Réclamer +3 crédits</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script src="db.js"></script>
+<script src="chat.js"></script>
+<script src="feed.js"></script>
+<script src="portfolio.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
