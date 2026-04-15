@@ -1,14 +1,10 @@
 // ============================================================
 // MONA INVEST — Public Configuration
 // ============================================================
-// Fill in your Supabase project URL and anon key here.
-// These values are safe to expose in the frontend.
-// The Anthropic API key is kept secret in Netlify Functions.
-// ============================================================
 
 window.APP_CONFIG = {
-  SUPABASE_URL: bboachalrqodasomdlnb
-  SUPABASE_ANON_KEY: sb_publishable_yBioxEaaNEWGwe3rI5T7_g_mwHbHu-F
+  SUPABASE_URL: 'https://bboachalrqodasomdlnb.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_yBioxEaaNEWGwe3rI5T7_g_mwHbHu-F',
 
   // API base path (Netlify Functions proxy)
   API_BASE: '/api',
