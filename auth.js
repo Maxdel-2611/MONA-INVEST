@@ -8,6 +8,13 @@
 
   const { SUPABASE_URL, SUPABASE_ANON_KEY } = window.APP_CONFIG;
 
+  // Clear any stale auth locks left by previous sessions (iOS PWA issue)
+  try {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('lock:'))
+      .forEach(k => localStorage.removeItem(k));
+  } catch (e) {}
+
   // Initialize Supabase client (using the UMD bundle from CDN)
   const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
