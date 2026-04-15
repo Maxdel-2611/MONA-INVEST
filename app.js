@@ -668,7 +668,10 @@
     Portfolio.initPortfolioSection();
 
     Auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      // INITIAL_SESSION = app reopened with existing session
+      // SIGNED_IN = fresh login
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+        if (currentUser && currentUser.id === session.user.id) return; // already loaded
         currentUser = session.user;
 
         try {
@@ -694,7 +697,7 @@
           console.error('Profile load error:', err);
           Auth.showAuthScreen();
         }
-      } else if (event === 'SIGNED_OUT') {
+      } else if (event === 'SIGNED_OUT' || (event === 'INITIAL_SESSION' && !session)) {
         currentUser = null;
         currentProfile = null;
         Auth.showAuthScreen();
