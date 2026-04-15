@@ -701,14 +701,24 @@
       }
     });
 
-    // Check for existing session
+    // Check for existing session (with timeout fallback to avoid infinite loading)
+    const loadingTimeout = setTimeout(() => {
+      const loadingEl = document.getElementById('loading-screen');
+      if (loadingEl && !loadingEl.classList.contains('hidden')) {
+        console.warn('Session check timed out — showing auth screen');
+        Auth.showAuthScreen();
+      }
+    }, 7000);
+
     try {
       const session = await Auth.getSession();
+      clearTimeout(loadingTimeout);
       if (!session) {
         Auth.showAuthScreen();
       }
       // onAuthStateChange will handle the rest
     } catch (err) {
+      clearTimeout(loadingTimeout);
       console.error('Session check error:', err);
       Auth.showAuthScreen();
     }
