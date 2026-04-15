@@ -7,8 +7,8 @@
 // ============================================================
 
 window.APP_CONFIG = {
-  SUPABASE_URL: 'https://YOUR_PROJECT_ID.supabase.co',
-  SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_KEY',
+  SUPABASE_URL: bboachalrqodasomdlnb
+  SUPABASE_ANON_KEY: sb_publishable_yBioxEaaNEWGwe3rI5T7_g_mwHbHu-F
 
   // API base path (Netlify Functions proxy)
   API_BASE: '/api',
