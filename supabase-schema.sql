@@ -170,3 +170,56 @@ CREATE INDEX IF NOT EXISTS idx_positions_user_id    ON public.positions(user_id)
 CREATE INDEX IF NOT EXISTS idx_positions_platform   ON public.positions(platform);
 CREATE INDEX IF NOT EXISTS idx_chat_history_user_id ON public.chat_history(user_id);
 CREATE INDEX IF NOT EXISTS idx_feed_expires_at      ON public.feed_items(expires_at);
+
+-- ============================================================
+-- MIGRATION: Compte courant & Budget (à exécuter dans Supabase SQL Editor)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS public.bank_accounts (
+  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  name            TEXT NOT NULL DEFAULT 'Compte courant',
+  type            TEXT DEFAULT 'checking' CHECK (type IN ('checking', 'savings', 'livret', 'other')),
+  current_balance NUMERIC DEFAULT 0,
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.recurring_items (
+  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id      UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  type         TEXT NOT NULL CHECK (type IN ('income', 'expense')),
+  label        TEXT NOT NULL,
+  amount       NUMERIC NOT NULL DEFAULT 0,
+  day_of_month INTEGER DEFAULT 1 CHECK (day_of_month BETWEEN 1 AND 31),
+  category     TEXT DEFAULT 'autre',
+  active       BOOLEAN DEFAULT TRUE,
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.occasional_expenses (
+  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id    UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  label      TEXT NOT NULL,
+  amount     NUMERIC NOT NULL DEFAULT 0,
+  date       DATE DEFAULT CURRENT_DATE,
+  category   TEXT DEFAULT 'autre',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.bank_accounts       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.recurring_items     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.occasional_expenses ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "bank_select_own"       ON public.bank_accounts       FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "bank_insert_own"       ON public.bank_accounts       FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "bank_update_own"       ON public.bank_accounts       FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "bank_delete_own"       ON public.bank_accounts       FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "recurring_select_own"  ON public.recurring_items     FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "recurring_insert_own"  ON public.recurring_items     FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "recurring_update_own"  ON public.recurring_items     FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "recurring_delete_own"  ON public.recurring_items     FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "occasional_select_own" ON public.occasional_expenses FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "occasional_insert_own" ON public.occasional_expenses FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "occasional_delete_own" ON public.occasional_expenses FOR DELETE USING (auth.uid() = user_id);

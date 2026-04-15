@@ -109,6 +109,9 @@
         case 'portfolio':
           Portfolio.loadPortfolio(currentProfile);
           break;
+        case 'bank':
+          Bank.loadBankSection(currentProfile);
+          break;
       }
     }
 
@@ -478,6 +481,7 @@
       Feed.setProfile(currentProfile);
       Chat.setProfile(currentProfile);
       Portfolio.setProfile(currentProfile);
+      Bank.setProfile(currentProfile);
 
       showToast('Bienvenue dans Mona Invest Pro ! 🎉');
     }).catch(console.error);
@@ -520,6 +524,7 @@
     Feed.setProfile(currentProfile);
     Chat.setProfile(currentProfile);
     Portfolio.setProfile(currentProfile);
+    Bank.setProfile(currentProfile);
 
     updateUserUI();
     initAdBanner(currentProfile);
@@ -635,6 +640,7 @@
         Feed.closeDetail();
         Portfolio.closeModal();
         Chat.closeRewardModal();
+        Bank.closeModal();
       }
     });
   }

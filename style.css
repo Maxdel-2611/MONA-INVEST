@@ -1267,3 +1267,137 @@ h4 { font-size: 1.1rem; }
   .feed-filters { gap: 0.3rem; }
   .filter-btn { padding: 0.35rem 0.6rem; font-size: 0.8rem; }
 }
+
+/* ============================================================
+   COMPTE & BUDGET
+   ============================================================ */
+.bank-accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem; margin-bottom: 1.5rem;
+}
+
+.bank-account-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+
+.bank-account-header {
+  display: flex; align-items: center; gap: 0.75rem;
+}
+
+.bank-account-type-icon { font-size: 1.5rem; }
+
+.bank-account-info { flex: 1; }
+.bank-account-name { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); }
+.bank-account-type { font-size: 0.75rem; color: var(--text-muted); }
+.bank-account-actions { display: flex; gap: 0.25rem; }
+
+.bank-account-balance {
+  font-size: 1.6rem; font-weight: 600; color: var(--text-primary);
+}
+
+.bank-account-updated { font-size: 0.72rem; color: var(--text-muted); }
+
+.bank-add-account-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.5rem; min-height: 120px;
+  background: var(--bg-secondary); border: 2px dashed var(--border);
+  border-radius: var(--radius); color: var(--text-muted);
+  font-family: var(--font-body); font-size: 0.9rem; font-weight: 600;
+  transition: all var(--transition);
+}
+.bank-add-account-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+.bank-summary-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem; margin-bottom: 1.5rem;
+}
+
+.bank-summary-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem;
+}
+.bank-summary-card.highlight {
+  border-color: var(--amber); background: var(--amber-dim);
+}
+.bank-summary-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.25rem; }
+.bank-summary-value { font-size: 1.1rem; font-weight: 600; }
+.bank-summary-value.positive { color: var(--green); }
+.bank-summary-value.negative { color: var(--red); }
+
+.bank-forecast-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem;
+}
+.bank-forecast-header { margin-bottom: 1rem; }
+.bank-forecast-header h3 { font-size: 1.1rem; color: var(--text-primary); }
+
+.forecast-chart-wrap { width: 100%; }
+.forecast-svg { width: 100%; height: 120px; }
+.forecast-labels {
+  display: flex; justify-content: space-between;
+  font-size: 0.72rem; color: var(--text-muted);
+  font-family: var(--font-mono); margin-top: 0.25rem;
+}
+.forecast-minmax {
+  display: flex; justify-content: space-between; margin-top: 0.25rem;
+}
+
+.bank-two-col {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+
+.bank-col-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem;
+}
+
+.bank-col-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.bank-col-header h3 { font-size: 1rem; color: var(--text-primary); }
+
+.recurring-group-label {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.5rem;
+}
+
+.recurring-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.6rem 0; border-bottom: 1px solid var(--border);
+}
+.recurring-row:last-child { border-bottom: none; }
+
+.recurring-day {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600;
+  color: var(--text-muted); flex-shrink: 0;
+}
+
+.recurring-info { flex: 1; min-width: 0; }
+.recurring-label { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+.recurring-category { font-size: 0.72rem; color: var(--text-muted); }
+.recurring-amount { font-size: 0.9rem; font-weight: 600; }
+.recurring-amount.positive { color: var(--green); }
+.recurring-amount.negative { color: var(--red); }
+
+.occasional-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.6rem 0; border-bottom: 1px solid var(--border);
+}
+.occasional-row:last-child { border-bottom: none; }
+.occasional-info { flex: 1; min-width: 0; }
+.occasional-label { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+.occasional-meta { font-size: 0.72rem; color: var(--text-muted); }
+.occasional-amount { font-size: 0.9rem; font-weight: 600; }
+.occasional-amount.negative { color: var(--red); }
+
+@media (max-width: 767px) {
+  .bank-two-col { grid-template-columns: 1fr; }
+  .bank-summary-row { grid-template-columns: 1fr 1fr; }
+}
