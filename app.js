@@ -446,6 +446,124 @@
     });
   }
 
+  // ── Profile Edit Modal ────────────────────────────────────────
+
+  function openProfileModal() {
+    if (!currentProfile) return;
+    const modal = document.getElementById('modal-profile');
+    const overlay = document.getElementById('modal-overlay');
+    if (!modal || !overlay) return;
+
+    // Pre-fill inputs
+    setValue('pf-income',   currentProfile.income            || '');
+    setValue('pf-fixed',    currentProfile.fixed_expenses    || '');
+    setValue('pf-variable', currentProfile.variable_expenses || '');
+    setValue('pf-savings',  currentProfile.savings_buffer    || '');
+    setValue('pf-budget',   currentProfile.monthly_budget    || 300);
+
+    // Investment mode
+    const mode = currentProfile.investment_mode || 'balanced';
+    const modeRadio = document.querySelector(`input[name="pf-mode"][value="${mode}"]`);
+    if (modeRadio) modeRadio.checked = true;
+
+    // Goals
+    const goals = currentProfile.goals || [];
+    document.querySelectorAll('#pf-goals-grid input[type="checkbox"]').forEach(cb => {
+      cb.checked = goals.includes(cb.value);
+    });
+
+    // Update investable preview
+    updateInvestablePreview();
+
+    modal.classList.remove('hidden');
+    overlay.classList.remove('hidden');
+    overlay.onclick = (e) => { if (e.target === overlay) closeProfileModal(); };
+  }
+
+  function closeProfileModal() {
+    document.getElementById('modal-profile')?.classList.add('hidden');
+    const overlay = document.getElementById('modal-overlay');
+    // Only hide overlay if all modals are hidden
+    const anyOpen = document.querySelector('#modal-overlay .modal:not(.hidden)');
+    if (!anyOpen && overlay) { overlay.classList.add('hidden'); overlay.onclick = null; }
+  }
+
+  function updateInvestablePreview() {
+    const income   = parseFloat(document.getElementById('pf-income')?.value)   || 0;
+    const fixed    = parseFloat(document.getElementById('pf-fixed')?.value)    || 0;
+    const variable = parseFloat(document.getElementById('pf-variable')?.value) || 0;
+    const investable = Math.max(0, income - fixed - variable);
+    const el = document.getElementById('pf-investable');
+    if (el) el.textContent = `${investable.toLocaleString('fr-FR')} €/mois`;
+  }
+
+  function initProfileModal() {
+    // Open button
+    document.getElementById('edit-profile-btn')?.addEventListener('click', openProfileModal);
+
+    // Close buttons
+    document.getElementById('profile-modal-close')?.addEventListener('click',  closeProfileModal);
+    document.getElementById('profile-modal-cancel')?.addEventListener('click', closeProfileModal);
+
+    // Live investable preview
+    ['pf-income', 'pf-fixed', 'pf-variable'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', updateInvestablePreview);
+    });
+
+    // Mode radio → sync budget field
+    document.querySelectorAll('input[name="pf-mode"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        const budgetMap = { chill: 100, balanced: 300, ambitious: 600 };
+        setValue('pf-budget', budgetMap[radio.value] || 300);
+      });
+    });
+
+    // Form submit
+    document.getElementById('profile-edit-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const saveBtn = document.getElementById('profile-modal-save');
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Enregistrement…'; }
+
+      const goals = Array.from(
+        document.querySelectorAll('#pf-goals-grid input[type="checkbox"]:checked')
+      ).map(cb => cb.value);
+
+      const selectedMode = document.querySelector('input[name="pf-mode"]:checked')?.value || 'balanced';
+
+      const updates = {
+        income:            parseFloat(document.getElementById('pf-income')?.value)   || 0,
+        fixed_expenses:    parseFloat(document.getElementById('pf-fixed')?.value)    || 0,
+        variable_expenses: parseFloat(document.getElementById('pf-variable')?.value) || 0,
+        savings_buffer:    parseFloat(document.getElementById('pf-savings')?.value)  || 0,
+        investment_mode:   selectedMode,
+        monthly_budget:    parseFloat(document.getElementById('pf-budget')?.value)   || 300,
+        goals,
+      };
+
+      try {
+        const updated = await DB.updateProfile(currentUser.id, updates);
+        currentProfile = { ...currentProfile, ...updated };
+        updateUserUI();
+        if (currentSection === 'dashboard') renderDashboard();
+        closeProfileModal();
+        showToast('Profil financier mis à jour');
+      } catch (err) {
+        console.error('Profile update error:', err);
+        showToast('Erreur lors de la sauvegarde');
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Enregistrer`;
+        }
+      }
+    });
+  }
+
+  function setValue(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  }
+
   // ── Pro Modal ─────────────────────────────────────────────────
 
   function showProModal(message) {
@@ -633,9 +751,12 @@
   }
 
   function initModals() {
+    initProfileModal();
+
     // Close on escape
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        closeProfileModal();
         closeProModal();
         Feed.closeDetail();
         Portfolio.closeModal();
@@ -694,6 +815,8 @@
     navigate,
     showProModal,
     closeProModal,
+    openProfileModal,
+    closeProfileModal,
     updateDashboard,
     updateProfile,
     getCurrentProfile: () => currentProfile,

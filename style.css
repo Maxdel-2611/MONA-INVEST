@@ -1401,3 +1401,101 @@ h4 { font-size: 1.1rem; }
   .bank-two-col { grid-template-columns: 1fr; }
   .bank-summary-row { grid-template-columns: 1fr 1fr; }
 }
+
+/* ── Profile Edit Modal ───────────────────────────────────────── */
+.pf-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+.pf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.pf-investable-row {
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(184,115,51,0.08);
+  border: 1px solid rgba(184,115,51,0.2);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pf-investable-value {
+  color: var(--copper);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.pf-mode-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+.pf-mode-option {
+  cursor: pointer;
+  display: block;
+}
+.pf-mode-option input[type="radio"] {
+  display: none;
+}
+.pf-mode-card {
+  padding: 0.65rem 0.5rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+.pf-mode-option input[type="radio"]:checked + .pf-mode-card {
+  border-color: var(--copper);
+  background: rgba(184,115,51,0.08);
+}
+.pf-mode-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.pf-mode-amount {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+.pf-goals-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.pf-goal-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  transition: border-color 0.2s, background 0.2s;
+}
+.pf-goal-option:has(input:checked) {
+  border-color: var(--copper);
+  background: rgba(184,115,51,0.08);
+  color: var(--text-primary);
+}
+.pf-goal-option input[type="checkbox"] {
+  accent-color: var(--copper);
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-width: 500px) {
+  .pf-grid { grid-template-columns: 1fr; }
+  .pf-mode-group { grid-template-columns: 1fr; }
+  .pf-goals-grid { grid-template-columns: 1fr; }
+}
