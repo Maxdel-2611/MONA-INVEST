@@ -18,21 +18,28 @@
       title: 'N26 Pro — Banque premium en ligne',
       desc: 'Ouvrez un compte bancaire premium en 8 minutes. Cashback illimité.',
       cta: 'Ouvrir un compte',
-      url: '#',
+      url: () => window.APP_CONFIG.AFFILIATE_N26,
     },
     {
       icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A3590" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
       title: 'DEGIRO — Investissez sans frais',
       desc: 'Les frais de courtage les plus bas d\'Europe. 0€ sur les ETF.',
       cta: 'Commencer',
-      url: '#',
+      url: () => window.APP_CONFIG.AFFILIATE_DEGIRO,
     },
     {
       icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7A8F62" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`,
       title: 'Trade Republic — 4% d\'intérêt',
       desc: 'Épargne automatique au meilleur taux. Investissez dès 1€.',
       cta: 'Découvrir',
-      url: '#',
+      url: () => window.APP_CONFIG.AFFILIATE_TRADE_REPUBLIC,
+    },
+    {
+      icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A3590" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>`,
+      title: 'eToro — Copiez les meilleurs traders',
+      desc: 'Investissez en actions, cryptos et ETF. CopyTrader disponible.',
+      cta: 'Commencer',
+      url: () => window.APP_CONFIG.AFFILIATE_ETORO,
     },
   ];
 
@@ -61,15 +68,21 @@
 
   function renderAd() {
     const ad = ADS[adIndex];
-    const iconEl = document.getElementById('ad-icon');
+    const iconEl  = document.getElementById('ad-icon');
     const titleEl = document.getElementById('ad-title');
-    const descEl = document.getElementById('ad-desc');
-    const ctaEl = document.getElementById('ad-cta');
+    const descEl  = document.getElementById('ad-desc');
+    const ctaEl   = document.getElementById('ad-cta');
 
-    if (iconEl) iconEl.innerHTML = ad.icon;
+    if (iconEl)  iconEl.innerHTML  = ad.icon;
     if (titleEl) titleEl.textContent = ad.title;
-    if (descEl) descEl.textContent = ad.desc;
-    if (ctaEl) ctaEl.textContent = ad.cta;
+    if (descEl)  descEl.textContent  = ad.desc;
+    if (ctaEl) {
+      ctaEl.textContent = ad.cta;
+      ctaEl.onclick = () => {
+        const url = typeof ad.url === 'function' ? ad.url() : ad.url;
+        if (url && url !== '#') window.open(url, '_blank', 'noopener');
+      };
+    }
   }
 
   // ── Section Navigation ────────────────────────────────────────
@@ -587,22 +600,48 @@
   }
 
   function activatePro() {
-    // Simulate Pro activation (in production, integrate with Stripe/Lemonsqueezy)
-    if (!currentProfile) return;
-    DB.updateProfile(currentProfile.id, { plan: 'pro' }).then(updated => {
-      currentProfile = { ...currentProfile, ...updated };
-      closeProModal();
-      updateUserUI();
-      initAdBanner(currentProfile);
+    if (!currentUser || !currentProfile) return;
 
-      // Update all modules
-      Feed.setProfile(currentProfile);
-      Chat.setProfile(currentProfile);
-      Portfolio.setProfile(currentProfile);
-      Bank.setProfile(currentProfile);
+    const baseUrl = window.APP_CONFIG.LEMON_CHECKOUT_URL;
 
-      showToast('Bienvenue dans Mona Invest Pro ! 🎉');
-    }).catch(console.error);
+    // If Lemonsqueezy not configured yet, show a message
+    if (!baseUrl || baseUrl.includes('VOTRE-BOUTIQUE')) {
+      showToast('Paiement en cours de configuration — réessayez bientôt.');
+      return;
+    }
+
+    // Build checkout URL with user data pre-filled
+    const checkoutUrl = new URL(baseUrl);
+    checkoutUrl.searchParams.set('checkout[email]', currentUser.email);
+    checkoutUrl.searchParams.set('checkout[custom][user_id]', currentUser.id);
+    checkoutUrl.searchParams.set('checkout[success_url]', window.location.origin + '?pro=1');
+
+    closeProModal();
+    window.open(checkoutUrl.toString(), '_blank', 'noopener');
+  }
+
+  // Called when Lemonsqueezy redirects back after payment
+  function checkProReturn() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('pro') === '1') {
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+      // Reload profile to pick up plan=pro set by webhook
+      if (currentUser) {
+        DB.getProfile(currentUser.id).then(profile => {
+          if (profile) {
+            currentProfile = profile;
+            updateUserUI();
+            initAdBanner(currentProfile);
+            Feed.setProfile(currentProfile);
+            Chat.setProfile(currentProfile);
+            Portfolio.setProfile(currentProfile);
+            Bank.setProfile(currentProfile);
+            showToast('Bienvenue dans Mona Invest Pro !');
+          }
+        }).catch(console.error);
+      }
+    }
   }
 
   // ── User UI ───────────────────────────────────────────────────
@@ -652,6 +691,9 @@
 
     // Pre-load portfolio data for dashboard
     Portfolio.loadPortfolio(currentProfile);
+
+    // Check if returning from Lemonsqueezy checkout
+    checkProReturn();
   }
 
   // ── Init App ──────────────────────────────────────────────────
